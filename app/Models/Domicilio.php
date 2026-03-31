@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Table(
+    'domicilios',
+    key: 'rfc',
+    incrementing: false,
+    timestamps: false
+)]
 class Domicilio extends Model
 {
     use HasFactory;
 
-    protected $table = 'domicilios';
-    protected $primaryKey = 'rfc';
-    public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
     protected $fillable = ["calle", "numero", "colonia", "cp"];
     public function persona(): BelongsTo
     {
