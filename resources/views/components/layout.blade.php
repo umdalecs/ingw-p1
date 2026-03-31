@@ -21,8 +21,8 @@
     <main>
         {{ $slot }}
     </main>
+    @vite(['resources/js/personas.js'])
 </body>
 
 </html>
 
-@vite(['resources/js/personas.js'])
