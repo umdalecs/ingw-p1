@@ -16,11 +16,14 @@ readonly class PersonaRepository
         private PersonaModel $personaModel,
     ) {}
 
-    public function recuperarTodos(): LengthAwarePaginator
+    public function recuperarTodos(?string $filter): LengthAwarePaginator
     {
         $paginator = $this->personaModel::with('domicilio')
+            ->when($filter, function ($query, $filter) {
+                $query->where('rfc', 'LIKE', "%{$filter}%");
+            })
             ->orderBy('personas.rfc')
-            ->paginate(16);
+            ->paginate(16);;
 
         $paginator->setCollection($paginator->getCollection()->map(function (PersonaModel $m) {
             $d = $m->domicilio;
@@ -108,7 +111,6 @@ readonly class PersonaRepository
                     'colonia' => $d->getColonia(),
                     'cp' => $d->getCp(),
                 ]);
-
             });
             return true;
         } catch (Throwable $e) {

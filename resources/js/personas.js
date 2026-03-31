@@ -8,7 +8,11 @@ const rfc = document.querySelector('#rfc')
 form?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (rfc.value.trim() === '') return;
-    window.location.href = `/${rfc.value}`;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("filter", rfc.value);
+
+    window.location.href = url.href;
 })
 
 const modifyButtons = document.querySelectorAll("button[mutative]")

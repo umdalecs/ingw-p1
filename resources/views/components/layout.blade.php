@@ -8,11 +8,17 @@
     @vite(['resources/css/app.css'])
 </head>
 
-<body>
-    <a href="/">
-        <h1 class="font-bold text-3xl p-4">Personas</h1>
-    </a>
-    <main class="px-4">
+<body  class="p-4">
+    <header class="flex justify-between gap-4 items-center font-bold text-3xl">
+        <a href="/">
+            <h1 class="font-bold text-3xl">Personas</h1>
+        </a>
+        <section>
+            {{ $rightSide ?? '' }}
+        </section>
+    </header>
+
+    <main>
         {{ $slot }}
     </main>
 </body>

@@ -1,7 +1,6 @@
 @if ($paginator->hasPages())
     <nav>
         <div class="flex-1 flex gap-2 items-center justify-between">
-
             <div>
                 <p class="text-sm text-primary-content">
                     Mostrando

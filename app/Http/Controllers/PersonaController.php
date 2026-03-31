@@ -10,6 +10,7 @@ use App\Dtos\PersonaDto;
 use App\Dtos\DomicilioDto;
 use App\Http\Requests\CreatePersonaRequest;
 use App\Http\Requests\ModifyPersonaRequest;
+use Illuminate\Http\Request;
 
 class PersonaController extends Controller
 {
@@ -17,9 +18,13 @@ class PersonaController extends Controller
         private readonly PersonaService $personaService
     ) {}
 
-    public function listarPersonas(): View
+    public function listarPersonas(Request $request): View
     {
-        $personas = $this->personaService->recuperarTodos();
+        $validated = $request->validate([
+            'filter' => 'nullable|string|max:255'
+        ]);
+
+        $personas = $this->personaService->recuperarTodos($validated['filter'] ?? null);
 
         return view("index", [
             'personas' => $personas

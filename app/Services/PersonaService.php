@@ -11,9 +11,9 @@ readonly class PersonaService
     private PersonaRepository $repo,
   ) {}
 
-  public function recuperarTodos(): LengthAwarePaginator
+  public function recuperarTodos(?string $filter): LengthAwarePaginator
   {
-    return $this->repo->recuperarTodos();
+    return $this->repo->recuperarTodos($filter);
   }
 
   public function recuperarPorRFC(string $rfc): ?PersonaDto

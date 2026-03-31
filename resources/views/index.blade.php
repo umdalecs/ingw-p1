@@ -1,16 +1,17 @@
 <x-layout>
-    <div class="flex justify-end gap-4 items-center font-bold text-3xl">
+    <x-slot:rightSide>
         <form class="form inline-flex gap-2" id="buscar">
             <label class="input">
-                <input type="text" id="rfc" name="rfc" placeholder="Buscar por RFC" />
+                <input type="text" id="rfc" name="rfc" placeholder="Filtrar por RFC" />
                 <button type="submit" class="label">🔍</button>
             </label>
         </form>
         <a href="/new" class="btn btn-primary">
             Agregar
         </a>
-    </div>
-    <div class="">
+    </x-slot:rightSide>
+
+    <section>
         @if (session()->has('error'))
             <div role="alert" class="alert alert-error alert-soft mt-4">
                 {{ session()->get('error') }}
@@ -22,7 +23,7 @@
                 {{ session()->get('success') }}
             </div>
         @endif
-    </div>
+    </section>
 
     <table class="my-4 table table-zebra">
         <thead>
