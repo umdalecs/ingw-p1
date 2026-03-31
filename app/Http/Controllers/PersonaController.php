@@ -4,32 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Services\PersonaService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PersonaController extends Controller
 {
     public function __construct(
-        private PersonaService $personaService
+        private readonly PersonaService $personaService
     ) {}
 
     public function index(): View
     {
         $personas = $this->personaService->getAll();
 
-
         return view("index", [
             'personas' => $personas
         ]);
     }
 
-    public function createPersona(): View
+    public function personaForm(?string $rfc = null): View|RedirectResponse
     {
-        return view("personaForm");
-    }
+        if ($rfc == null)
+            return view("personaForm"   );
 
-    public function editPersona(string $rfc): View|RedirectResponse
-    {
         $persona = $this->personaService->getByRFC($rfc);
 
         if ($persona == null)
@@ -38,5 +34,25 @@ class PersonaController extends Controller
         return view("personaForm", [
             'persona' => $persona
         ]);
+    }
+
+    public function crearPersona(): RedirectResponse
+    {
+        return redirect('/')->with('error', 'Error al crear la persona');
+    }
+
+    public function modificarPersona(): RedirectResponse
+    {
+        return redirect('/')->with('error', 'Error al modificar persona');
+    }
+
+    public function borrarPersona(string $rfc): RedirectResponse
+    {
+        $result = $this->personaService->delete($rfc);
+
+        if (!$result)
+            return redirect('/')->with('error', 'Error al eliminar persona');
+
+        return redirect('/')->with('success', 'Persona eliminada exitosamente');
     }
 }

@@ -15,7 +15,7 @@ class Persona extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
-    protected $fillable = ["calle", "numero", "colonia", "cp"];
+    protected $fillable = ["nombre"];
     public function domicilio(): HasOne
     {
         return $this->hasOne(Domicilio::class, 'rfc', 'rfc');
