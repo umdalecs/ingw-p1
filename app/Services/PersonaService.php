@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entities\Persona as PersonaEntity;
+use App\Dtos\PersonaDto;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 readonly class PersonaService
@@ -11,18 +11,28 @@ readonly class PersonaService
     private PersonaRepository $repo,
   ) {}
 
-  public function getAll(): LengthAwarePaginator
+  public function recuperarTodos(): LengthAwarePaginator
   {
-    return $this->repo->getAll();
+    return $this->repo->recuperarTodos();
   }
 
-  public function getByRFC(string $rfc): ?PersonaEntity
+  public function recuperarPorRFC(string $rfc): ?PersonaDto
   {
-    return $this->repo->getByRFC($rfc);
+    return $this->repo->recuperarPorRFC($rfc);
   }
 
-  public function delete(string $rfc): bool
+  public function agregarPersona(PersonaDto $personaDto): bool
   {
-      return $this->repo->delete($rfc);
+    return $this->repo->agregarPersona($personaDto);
+  }
+
+  public function modificarPersona(PersonaDto $personaDto): bool
+  {
+    return $this->repo->modificarPersona($personaDto);
+  }
+
+  public function borrar(string $rfc): bool
+  {
+    return $this->repo->borrar($rfc);
   }
 }

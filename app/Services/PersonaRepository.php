@@ -3,19 +3,20 @@
 namespace App\Services;
 
 use App\Models\Persona as PersonaModel;
-use App\Entities\Persona as PersonaEntity;
-use App\Entities\Domicilio as DomicilioEntity;
+use App\Models\Domicilio as DomicilioModel;
+use App\Dtos\PersonaDto;
+use App\Dtos\DomicilioDto;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 readonly class PersonaRepository
 {
     public function __construct(
         private PersonaModel $personaModel,
-    )
-    {
-    }
+    ) {}
 
-    public function getAll(): LengthAwarePaginator
+    public function recuperarTodos(): LengthAwarePaginator
     {
         $paginator = $this->personaModel::with('domicilio')
             ->orderBy('personas.rfc')
@@ -24,10 +25,10 @@ readonly class PersonaRepository
         $paginator->setCollection($paginator->getCollection()->map(function (PersonaModel $m) {
             $d = $m->domicilio;
 
-            return new PersonaEntity(
+            return new PersonaDto(
                 $m->rfc,
                 $m->nombre,
-                new DomicilioEntity(
+                new DomicilioDto(
                     $d->calle,
                     $d->numero,
                     $d->colonia,
@@ -39,7 +40,7 @@ readonly class PersonaRepository
         return $paginator;
     }
 
-    public function getByRFC(string $rfc): ?PersonaEntity
+    public function recuperarPorRFC(string $rfc): ?PersonaDto
     {
         $m = $this->personaModel::with('domicilio')
             ->select('*')
@@ -51,10 +52,10 @@ readonly class PersonaRepository
 
         $d = $m->domicilio;
 
-        return new PersonaEntity(
+        return new PersonaDto(
             $m->rfc,
             $m->nombre,
-            new DomicilioEntity(
+            new DomicilioDto(
                 $d->calle,
                 $d->numero,
                 $d->colonia,
@@ -63,9 +64,61 @@ readonly class PersonaRepository
         );
     }
 
-    public function delete(string $rfc): bool
+    public function agregarPersona(PersonaDto $personaDto): bool
+    {
+        try {
+            DB::transaction(function () use ($personaDto) {
+                $d = $personaDto->getDomicilio();
+
+                $persona = PersonaModel::create([
+                    'rfc' => $personaDto->getRfc(),
+                    'nombre' => $personaDto->getNombre(),
+                ]);
+
+                $persona->domicilio()->create([
+                    'calle' => $d->getCalle(),
+                    'numero' => $d->getNumero(),
+                    'colonia' => $d->getColonia(),
+                    'cp' => $d->getCp(),
+                ]);
+            });
+            return true;
+        } catch (Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    public function modificarPersona(PersonaDto $personaDto): bool
+    {
+        try {
+            DB::transaction(function () use ($personaDto) {
+                $personaModel = PersonaModel::with('domicilio')
+                    ->find($personaDto->getRfc());
+
+                $personaModel->update([
+                    'nombre' => $personaDto->getNombre()
+                ]);
+
+                $d = $personaDto->getDomicilio();
+
+                $personaModel->domicilio->update([
+                    'calle' => $d->getCalle(),
+                    'numero' => $d->getNumero(),
+                    'colonia' => $d->getColonia(),
+                    'cp' => $d->getCp(),
+                ]);
+
+            });
+            return true;
+        } catch (Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    public function borrar(string $rfc): bool
     {
         return PersonaModel::destroy($rfc) == 1;
     }
-
 }

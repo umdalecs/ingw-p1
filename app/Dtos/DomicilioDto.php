@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entities;
+namespace App\Dtos;
 
-class Domicilio
+class DomicilioDto
 {
     public function __construct(
         private string $calle,

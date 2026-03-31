@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Entities;
+namespace App\Dtos;
 
-class Persona
+class PersonaDto
 {
     public function __construct(
         private string $rfc,
         private string $nombre,
-        private Domicilio $domicilio
+        private DomicilioDto $domicilio
     ) {}
 
     public function getRfc()

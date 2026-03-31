@@ -6,53 +6,88 @@ use App\Services\PersonaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+use App\Dtos\PersonaDto;
+use App\Dtos\DomicilioDto;
+use App\Http\Requests\CreatePersonaRequest;
+use App\Http\Requests\ModifyPersonaRequest;
+
 class PersonaController extends Controller
 {
     public function __construct(
         private readonly PersonaService $personaService
     ) {}
 
-    public function index(): View
+    public function listarPersonas(): View
     {
-        $personas = $this->personaService->getAll();
+        $personas = $this->personaService->recuperarTodos();
 
         return view("index", [
             'personas' => $personas
         ]);
     }
 
-    public function personaForm(?string $rfc = null): View|RedirectResponse
+    public function formularioPersonas(?string $rfc = null): View|RedirectResponse
     {
         if ($rfc == null)
-            return view("personaForm"   );
+            return view("personaForm");
 
-        $persona = $this->personaService->getByRFC($rfc);
+        $persona = $this->personaService->recuperarPorRFC($rfc);
 
         if ($persona == null)
-            return redirect("/")->with('error', 'Persona no encontrada');
+            return redirect("/")
+                ->with('error', 'Persona no encontrada');
 
         return view("personaForm", [
             'persona' => $persona
         ]);
     }
 
-    public function crearPersona(): RedirectResponse
+    public function crearPersona(CreatePersonaRequest $request): RedirectResponse
     {
-        return redirect('/')->with('error', 'Error al crear la persona');
+        $validated = $request->validated();
+
+        $success = $this->personaService->agregarPersona(new PersonaDto(
+            $validated['rfc'],
+            $validated['nombre'],
+            new DomicilioDto(
+                $validated['calle'],
+                $validated['numero'],
+                $validated['colonia'],
+                $validated['cp']
+            )
+        ));
+
+        return $success
+            ? redirect('/')->with('success', 'Persona creada exitosamente')
+            : redirect('/')->with('error', 'Error al crear la persona');
     }
 
-    public function modificarPersona(): RedirectResponse
+    public function modificarPersona(ModifyPersonaRequest $request, string $rfc): RedirectResponse
     {
-        return redirect('/')->with('error', 'Error al modificar persona');
+        $validated = $request->validated();
+
+        $success = $this->personaService->modificarPersona(new PersonaDto(
+            $rfc,
+            $validated['nombre'],
+            new DomicilioDto(
+                $validated['calle'],
+                $validated['numero'],
+                $validated['colonia'],
+                $validated['cp']
+            )
+        ));
+
+        return $success
+            ? redirect('/')->with('success', 'Persona modificada exitosamente')
+            : redirect('/')->with('error', 'Error al modificar persona');
     }
 
     public function borrarPersona(string $rfc): RedirectResponse
     {
-        $result = $this->personaService->delete($rfc);
+        $result = $this->personaService->borrar($rfc);
 
-        if (!$result)
-            return redirect('/')->with('error', 'Error al eliminar persona');
-
-        return redirect('/')->with('success', 'Persona eliminada exitosamente');
+        return $result
+            ? redirect('/')->with('success', 'Persona eliminada exitosamente')
+            : redirect('/')->with('error', 'Error al eliminar persona');
     }
 }
