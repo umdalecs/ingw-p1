@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     incrementing: false,
     timestamps: false
 )]
-#[Fillable('calle', 'numero', 'colonia', 'cp')]
+#[Fillable(['calle', 'numero', 'colonia', 'cp'])]
 class Domicilio extends Model
 {
     use HasFactory;

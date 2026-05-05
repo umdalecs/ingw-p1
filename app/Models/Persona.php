@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     incrementing: false,
     timestamps: false
 )]
-#[Fillable('nombre')]
+#[Fillable(['nombre'])]
 class Persona extends Model
 {
     use HasFactory;
